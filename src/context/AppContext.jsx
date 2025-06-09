@@ -8,7 +8,7 @@ export const AppContext = createContext();
 const AppContextProvider = (props) => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const [chatData, setChatData] = useState(null);
+  const [chatsData, setChatsData] = useState(null);
   const [messagesId, setMessagesId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [chatUser, setChatUser] = useState(null);
@@ -41,7 +41,7 @@ const AppContextProvider = (props) => {
     if (userData) {
       const chatRef = doc(db, "chats", userData.id);
       const unSub = onSnapshot(chatRef, async (res) => {
-        const chatItems = res.data().chatData;
+        const chatItems = res.data().chatsData;
         const tempData = [];
         for (const item of chatItems) {
           const userRef = doc(db, "users", item.rId);
@@ -49,7 +49,7 @@ const AppContextProvider = (props) => {
           const userData = userSnap.data();
           tempData.push({ ...item, userData });
         }
-        setChatData(tempData.sort((a, b) => b.updateAt - a.updateAt));
+        setChatsData(tempData.sort((a, b) => b.updateAt - a.updateAt));
       });
       return () => {
         unSub();
@@ -60,8 +60,8 @@ const AppContextProvider = (props) => {
   const value = {
     userData,
     setUserData,
-    chatData,
-    setChatData,
+    chatsData,
+    setChatsData,
     loadUserData,
     chatUser,
     setChatUser,

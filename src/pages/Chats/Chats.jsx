@@ -6,14 +6,14 @@ import "./Chats.css";
 import { AppContext } from "../../context/AppContext";
 
 const Chats = () => {
-  const { chatData, userData } = useContext(AppContext);
+  const { chatsData, userData } = useContext(AppContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (chatData && userData) {
+    if (chatsData && userData) {
       setLoading(false);
     }
-  }, [chatData, userData]);
+  }, [chatsData, userData]);
 
   return (
     <div className="chat">

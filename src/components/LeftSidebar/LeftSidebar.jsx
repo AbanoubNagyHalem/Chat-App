@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
-  const { userData, chatData, setChatUser, setMessagesId, messageId } =
+  const { userData, chatsData, setChatUser, setMessagesId, messageId } =
     useContext(AppContext);
   const [user, setUser] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -35,7 +35,7 @@ const LeftSidebar = () => {
 
         if (!querySnap.empty && querySnap.docs[0].data().id !== userData.id) {
           let userExist = false;
-          chatData.map((user) => {
+          chatsData.map((user) => {
             if (user.rId === querySnap.docs[0].data().id) {
               userExist = true;
             }
@@ -76,7 +76,7 @@ const LeftSidebar = () => {
       };
 
       await updateDoc(doc(chatsRef, user.id), {
-        chatData: arrayUnion({
+        chatsData: arrayUnion({
           messageId: newMessageRef.id,
           lastMessage: "",
           rId: userData.id,
@@ -85,7 +85,7 @@ const LeftSidebar = () => {
         }),
       });
       await updateDoc(doc(chatsRef, userData.id), {
-        chatData: arrayUnion({
+        chatsData: arrayUnion({
           messageId: newMessageRef.id,
           lastMessage: "",
           rId: user.id,
@@ -107,10 +107,10 @@ const LeftSidebar = () => {
       const userChatsRef = doc(db, "chats", userData.id);
       const userChatsSnapshot = await getDocs(userChatsRef);
       const userChatsData = userChatsSnapshot.data();
-      const chatIndex = userChatsData.chatData.findIndex(
+      const chatIndex = userChatsData.chatsData.findIndex(
         (c) => c.messageId === item.messageId
       );
-      userChatsData.chatData[chatIndex].messageSeen = true;
+      userChatsData.chatsData[chatIndex].messageSeen = true;
       await updateDoc(userChatsRef, {
         chatsData: userChatsData.chatsData,
       });
@@ -149,7 +149,7 @@ const LeftSidebar = () => {
             <p>{user.name}</p>
           </div>
         ) : (
-          chatData?.map((item, index) => (
+          chatsData?.map((item, index) => (
             <div
               onClick={() => setChat(item)}
               key={index}

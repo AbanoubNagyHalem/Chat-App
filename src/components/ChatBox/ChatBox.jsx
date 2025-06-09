@@ -38,17 +38,17 @@ const ChatBox = () => {
 
           if (userChatsSnapshot.exists()) {
             const userChatData = userChatsSnapshot.data();
-            const chatIndex = userChatData.chatData.findIndex(
+            const chatIndex = userChatData.chatsData.findIndex(
               (c) => c.messagesId === messagesId
             );
-            userChatData.chatData[chatIndex].lastMessage = input.slice(0, 30);
-            userChatData.chatData[chatIndex].updateAt = Date.now();
+            userChatData.chatsData[chatIndex].lastMessage = input.slice(0, 30);
+            userChatData.chatsData[chatIndex].updateAt = Date.now();
 
-            if (userChatData.chatData[chatIndex].rId === userData.id) {
-              userChatData.chatData[chatIndex].messageSeen = false;
+            if (userChatData.chatsData[chatIndex].rId === userData.id) {
+              userChatData.chatsData[chatIndex].messageSeen = false;
             }
             await updateDoc(userChatsRef, {
-              chatData: userChatData.chatData,
+              chatsData: userChatData.chatsData,
             });
           }
         });
@@ -79,17 +79,17 @@ const ChatBox = () => {
 
           if (userChatsSnapshot.exists()) {
             const userChatData = userChatsSnapshot.data();
-            const chatIndex = userChatData.chatData.findIndex(
+            const chatIndex = userChatData.chatsData.findIndex(
               (c) => c.messagesId === messagesId
             );
-            userChatData.chatData[chatIndex].lastMessage = "image";
-            userChatData.chatData[chatIndex].updateAt = Date.now();
+            userChatData.chatsData[chatIndex].lastMessage = "image";
+            userChatData.chatsData[chatIndex].updateAt = Date.now();
 
-            if (userChatData.chatData[chatIndex].rId === userData.id) {
-              userChatData.chatData[chatIndex].messageSeen = false;
+            if (userChatData.chatsData[chatIndex].rId === userData.id) {
+              userChatData.chatsData[chatIndex].messageSeen = false;
             }
             await updateDoc(userChatsRef, {
-              chatData: userChatData.chatData,
+              chatsData: userChatData.chatsData,
             });
           }
         });
