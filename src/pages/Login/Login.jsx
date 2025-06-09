@@ -52,7 +52,7 @@ const Login = () => {
         </button>
         <div className="login-term">
           <input type="checkbox" />
-          <p>Agree to the terms of use & privacy policy.</p>
+          <p> Agree to the terms of use & privacy policy.</p>
         </div>
         <div className="login-forgot">
           {currentState === "Sign Up" ? (
