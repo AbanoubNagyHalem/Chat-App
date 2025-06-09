@@ -5,6 +5,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -19,7 +20,7 @@ import { toast } from "react-toastify";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
-  const { userData, chatsData, setChatUser, setMessagesId, messageId } =
+  const { userData, chatsData, setChatUser, setMessagesId, messagesId } =
     useContext(AppContext);
   const [user, setUser] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -35,8 +36,8 @@ const LeftSidebar = () => {
 
         if (!querySnap.empty && querySnap.docs[0].data().id !== userData.id) {
           let userExist = false;
-          chatsData.map((user) => {
-            if (user.rId === querySnap.docs[0].data().id) {
+          chatsData.map((chat) => {
+            if (chat.rId === querySnap.docs[0].data().id) {
               userExist = true;
             }
           });
@@ -56,10 +57,21 @@ const LeftSidebar = () => {
   };
 
   const addChat = async () => {
-    const messagesRef = collection(db, "messages");
-    const chatsRef = collection(db, "chats");
-
     try {
+      // Check if a chat already exists with the user
+      const existingChat = chatsData.find((chat) => chat.rId === user.id);
+
+      if (existingChat) {
+        // If chat exists, set it as the active chat
+        await setChat(existingChat);
+        setUser(null);
+        setShowSearch(false);
+        return;
+      }
+
+      // If no chat exists, create a new one
+      const messagesRef = collection(db, "messages");
+      const chatsRef = collection(db, "chats");
       const newMessageRef = doc(messagesRef);
 
       await setDoc(newMessageRef, {
@@ -94,7 +106,10 @@ const LeftSidebar = () => {
         }),
       });
 
-      setChat({ ...newChatData, userData: user });
+      // Set the new chat as the active chat
+      await setChat({ ...newChatData, userData: user });
+      setUser(null);
+      setShowSearch(false);
     } catch (error) {
       toast.error(error.message);
     }
@@ -105,15 +120,17 @@ const LeftSidebar = () => {
       setMessagesId(item.messageId);
       setChatUser(item);
       const userChatsRef = doc(db, "chats", userData.id);
-      const userChatsSnapshot = await getDocs(userChatsRef);
-      const userChatsData = userChatsSnapshot.data();
-      const chatIndex = userChatsData.chatsData.findIndex(
-        (c) => c.messageId === item.messageId
-      );
-      userChatsData.chatsData[chatIndex].messageSeen = true;
-      await updateDoc(userChatsRef, {
-        chatsData: userChatsData.chatsData,
-      });
+      const userChatsSnapshot = await getDoc(userChatsRef);
+      if (userChatsSnapshot.exists()) {
+        const userChatsData = userChatsSnapshot.data();
+        const chatIndex = userChatsData.chatsData.findIndex(
+          (c) => c.messageId === item.messageId
+        );
+        userChatsData.chatsData[chatIndex].messageSeen = true;
+        await updateDoc(userChatsRef, {
+          chatsData: userChatsData.chatsData,
+        });
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -154,7 +171,9 @@ const LeftSidebar = () => {
               onClick={() => setChat(item)}
               key={index}
               className={`friends ${
-                item.messageSeen || item.messageId === messageId ? "" : "border"
+                item.messageSeen || item.messageId === messagesId
+                  ? ""
+                  : "border"
               }`}
             >
               <img

@@ -39,7 +39,7 @@ const ChatBox = () => {
           if (userChatsSnapshot.exists()) {
             const userChatData = userChatsSnapshot.data();
             const chatIndex = userChatData.chatsData.findIndex(
-              (c) => c.messagesId === messagesId
+              (c) => c.messageId === messagesId
             );
             userChatData.chatsData[chatIndex].lastMessage = input.slice(0, 30);
             userChatData.chatsData[chatIndex].updateAt = Date.now();
@@ -80,7 +80,7 @@ const ChatBox = () => {
           if (userChatsSnapshot.exists()) {
             const userChatData = userChatsSnapshot.data();
             const chatIndex = userChatData.chatsData.findIndex(
-              (c) => c.messagesId === messagesId
+              (c) => c.messageId === messagesId
             );
             userChatData.chatsData[chatIndex].lastMessage = "image";
             userChatData.chatsData[chatIndex].updateAt = Date.now();
@@ -146,7 +146,7 @@ const ChatBox = () => {
             key={index}
             className={msg.sId === userData.id ? "s-msg" : "r-msg"}
           >
-            {msg["Image"] ? (
+            {msg.image ? (
               <img className="msg-img" src={msg.image} alt="" />
             ) : (
               <p className="msg">{msg.text}</p>
@@ -172,7 +172,7 @@ const ChatBox = () => {
           onChange={(e) => setInput(e.target.value)}
           value={input}
           type="text"
-          placeholder="Sent a message"
+          placeholder="Send a message"
         />
         <input
           onChange={sendImage}
