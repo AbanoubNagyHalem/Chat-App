@@ -14,14 +14,22 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
-  const { userData, chatsData, setChatUser, setMessagesId, messagesId } =
-    useContext(AppContext);
+  const {
+    userData,
+    chatsData,
+    chatUser,
+    setChatUser,
+    setMessagesId,
+    messagesId,
+    chatVisible,
+    setChatVisible,
+  } = useContext(AppContext);
   const [user, setUser] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -106,10 +114,10 @@ const LeftSidebar = () => {
         }),
       });
 
-      // Set the new chat as the active chat
       await setChat({ ...newChatData, userData: user });
       setUser(null);
       setShowSearch(false);
+      setChatVisible(true);
     } catch (error) {
       toast.error(error.message);
     }
@@ -130,14 +138,28 @@ const LeftSidebar = () => {
         await updateDoc(userChatsRef, {
           chatsData: userChatsData.chatsData,
         });
+        setChatVisible(true);
       }
     } catch (error) {
       toast.error(error.message);
     }
   };
 
+  useEffect(() => {
+    const updateChatUserData = async () => {
+      if (chatUser) {
+        const userRef = doc(db, "users", chatUser.userData.id);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data();
+        setChatUser((prev) => ({ ...prev, userData: userData }));
+      }
+    };
+
+    updateChatUserData();
+  }, [chatsData]);
+
   return (
-    <div className="ls">
+    <div className={`ls ${chatVisible ? "hidden" : ""}`}>
       <div className="ls-top">
         <div className="ls-nav">
           <img src={assets.logo} className="logo" alt="" />
